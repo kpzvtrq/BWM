@@ -122,11 +122,12 @@ static const Key keys[] = {
 	{ 0, XK_F6, 	spawn, SHCMD("backlight incr 10") },
 
 /* Volume (OSS - Mixer) */
+	{ 0, XK_F1, 	spawn, SHCMD("mixer vol.mute=toggle") },
 	{ 0, XK_F2, 	spawn, SHCMD("mixer vol=-0.05") },
 	{ 0, XK_F3, 	spawn, SHCMD("mixer vol=+0.05") },
 
 	{ MODKEY, XK_space,		spawn, {.v = dmenucmd } },
-	{ MODKEY, XK_F12,			spawn, SHCMD("flameshot gui --path ~/img/screenshots") },
+	{ 0,			XK_F12,			spawn, SHCMD("flameshot gui --path ~/img/screenshots") },
 	{ MODKEY, XK_w, 			spawn, SHCMD("kitty") },
 	{ MODKEY, XK_l, 			spawn, SHCMD("firefox") },
 
