@@ -1,45 +1,86 @@
-PROG= bwm
-MAN=
+.OBJDIR: ./
 
-SRCS= bwm.c brw.c util.c
+CC = cc
 
-X11INC= /usr/local/include
-FREETYPEINC= /usr/local/include/freetype2
-X11LIB= /usr/local/lib
+VERSION = 6.8
 
-INCLUDES= -I$(X11INC) -I$(FREETYPEINC) -Isrc
+X11INC = /usr/local/include
+FREETYPEINC = /usr/local/include/freetype2
+X11LIB = /usr/local/lib
 
-CPPFLAGS= \
+INCS = -I$(X11INC) -I$(FREETYPEINC) -Isrc
+
+CPPFLAGS = \
 	-D_DEFAULT_SOURCE \
 	-D_BSD_SOURCE \
 	-D_XOPEN_SOURCE=700L \
 	-DVERSION=\"$(VERSION)\" \
-	-DXINERAMA \
-	$(INCLUDES)
+	-DXINERAMA
 
-CFLAGS= \
+CFLAGS = \
 	-std=c17 \
 	-pedantic \
 	-Wall \
 	-Wextra \
 	-Wno-deprecated-declarations \
 	-Os \
-	$(CPPFLAGS)
+	$(CPPFLAGS) \
+	$(INCS)
 
-LDADD= -L$(X11LIB) -lX11 -lXinerama -lfontconfig -lXft
+LIBS = \
+	-L$(X11LIB) \
+	-lX11 \
+	-lXinerama \
+	-lfontconfig \
+	-lXft
 
-release: all install
 
-.PATH: ${.CURDIR}/src
-.PATH: ${.CURDIR}/obj
-.OBJDIR: ${.CURDIR}/obj
+TARGET = bwm
 
-_DIR != mkdir -p ${.CURDIR}/obj ${.CURDIR}/build/bin
+OBJDIR = obj
 
-BINDIR= /usr/local/bin
+OBJS = \
+	$(OBJDIR)/brw.o \
+	$(OBJDIR)/bwm.o \
+	$(OBJDIR)/util.o
 
-.include <bsd.prog.mk>
 
-afterinstall:
-	mkdir -p ${.CURDIR}/build/bin
-	${INSTALL} ${INSTALL_COPY} -m 555 ${PROG} ${.CURDIR}/build/bin/${PROG}
+all: $(TARGET)
+
+
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+
+$(OBJDIR)/brw.o: src/brw.c src/config.h
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c src/brw.c -o $@
+
+$(OBJDIR)/bwm.o: src/bwm.c src/config.h
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c src/bwm.c -o $@
+
+$(OBJDIR)/util.o: src/util.c src/config.h
+	@mkdir -p $(OBJDIR)
+	$(CC) $(CFLAGS) -c src/util.c -o $@
+
+
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LIBS) -o $@
+
+
+clean:
+	rm -f $(TARGET)
+	rm -rf $(OBJDIR)
+
+
+install: $(TARGET)
+	install -d -m 755 /usr/local/bin
+	install -m 755 $(TARGET) /usr/local/bin
+
+
+uninstall:
+	rm -f /usr/local/bin/$(TARGET)
+
+
+.PHONY: all clean install uninstall
