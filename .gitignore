@@ -4,4 +4,6 @@ obj
 *.o
 slstatus/*.o
 st/*.o
-*.depend
+*.depend*
+*.rej
+*.orig
