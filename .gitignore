@@ -4,3 +4,4 @@ obj
 *.o
 slstatus/*.o
 st/*.o
+*.depend

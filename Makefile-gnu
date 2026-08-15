@@ -1,0 +1,27 @@
+PREFIX  ?= /usr/local
+BIN      = bwm
+
+LIBS = x11 xinerama fontconfig xft
+
+CPPFLAGS = -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=700L -Isrc $(shell pkg-config --cflags $(LIBS) 2>/dev/null || echo "")
+CFLAGS  += -std=c17 -pedantic -Wall -Os
+LDLIBS   = $(shell pkg-config --libs $(LIBS) 2>/dev/null || echo "-lX11 -lXinerama -lfontconfig -lXft")
+
+SRCS = src/brw.c src/bwm.c src/util.c
+OBJS = $(SRCS:.c=.o)
+
+all: $(BIN)
+
+$(BIN): $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+
+install: $(BIN)
+	install -Dm755 $(BIN) $(DESTDIR)$(PREFIX)/bin/$(BIN)
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/$(BIN)
+
+clean:
+	rm -f $(BIN) src/*.o
+
+.PHONY: all install uninstall clean

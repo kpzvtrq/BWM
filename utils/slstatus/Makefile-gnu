@@ -1,0 +1,33 @@
+PREFIX ?= /usr/local
+
+PKGS     = x11
+CPPFLAGS = -D_DEFAULT_SOURCE $(shell pkg-config --cflags $(PKGS) 2>/dev/null)
+CFLAGS  += -std=c99 -pedantic -Wall -Os
+# Убираем -lkvm (это для BSD), оставляем только то, что нужно Линуксу
+LDLIBS   = $(shell pkg-config --libs $(PKGS) 2>/dev/null || echo "-lX11")
+
+SRCS = slstatus.c util.c $(wildcard components/*.c)
+OBJS = $(SRCS:.c=.o)
+
+all: slstatus
+
+config.h:
+	cp config.def.h config.h
+
+$(OBJS): config.h slstatus.h arg.h util.h
+
+slstatus: $(OBJS)
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) $(LDLIBS)
+
+install: slstatus
+	install -Dm755 slstatus $(DESTDIR)$(PREFIX)/bin/slstatus
+	install -Dm644 slstatus.1 $(DESTDIR)$(PREFIX)/share/man/man1/slstatus.1
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/slstatus
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/slstatus.1
+
+clean:
+	rm -f slstatus $(OBJS)
+
+.PHONY: all clean install uninstall
