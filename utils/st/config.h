@@ -5,13 +5,16 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char *font = "JetBrainsMono Nerd Font:style=Bold:pixelsize=24:antialias=true:autohint=true";
+static char *font = "Jetbrains Mono:pixelsize=14:antialias=true:autohint=true";
 /* Spare fonts */
 static char *font2[] = {
-       "JetBrainsMono Nerd Font:style=Bold:pixelsize=24:antialias=true:autohint=true",
+       "Droid Sans Mono:style=Regular:pixelsize=14:antialias=true:autohint=true",
+       "Menlo:style=Regular:pixelsize=14:antialias=true:autohint=true",
+       "Inconsolata for Powerline:pixelsize=14:antialias=true:autohint=true",
+       "Hack Nerd Font Mono:pixelsize=14:antialias=true:autohint=true",
 };
 
-static int borderpx = 0;
+static int borderpx = 2;
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -104,30 +107,31 @@ float alpha = 0.7;
 /* Terminal colors (16 first used in escape sequence) */
 static const char *colorname[] = {
 
-/* 8 normal colors */
-  [0] = "#282828", /* black   */
-  [1] = "#cc241d", /* red     */
-  [2] = "#98971a", /* green   */
-  [3] = "#d79921", /* yellow  */
-  [4] = "#458588", /* blue    */
-  [5] = "#b16286", /* magenta */
-  [6] = "#689d6a", /* cyan    */
-  [7] = "#a89984", /* white   */
+  /* 8 normal colors */
+  [0] = "#002b36", /* black   */
+  [1] = "#dc322f", /* red     */
+  [2] = "#859900", /* green   */
+  [3] = "#b58900", /* yellow  */
+  [4] = "#268bd2", /* blue    */
+  [5] = "#6c71c4", /* magenta */
+  [6] = "#2aa198", /* cyan    */
+  [7] = "#93a1a1", /* white   */
 
   /* 8 bright colors */
-  [8]  = "#928374", /* black   */
-  [9]  = "#fb4934", /* red     */
-  [10] = "#b8bb26", /* green   */
-  [11] = "#fabd2f", /* yellow  */
-  [12] = "#83a598", /* blue    */
-  [13] = "#d3869b", /* magenta */
-  [14] = "#8ec07c", /* cyan    */
-  [15] = "#ebdbb2", /* white   */
+  [8]  = "#657b83", /* black   */
+  [9]  = "#dc322f", /* red     */
+  [10] = "#859900", /* green   */
+  [11] = "#b58900", /* yellow  */
+  [12] = "#268bd2", /* blue    */
+  [13] = "#6c71c4", /* magenta */
+  [14] = "#2aa198", /* cyan    */
+  [15] = "#fdf6e3", /* white   */
 
   /* special colors */
-  [256] = "#000000", /* background (Hard) */
-  [257] = "#ebdbb2", /* foreground */
- };
+  [256] = "#272727", /* background */
+  [257] = "#ffffff", /* foreground */
+};
+
 
 /*
  * Default colors (colorname index)
@@ -180,6 +184,8 @@ static uint forcemousemod = ShiftMask;
  */
 static MouseShortcut mshortcuts[] = {
 	/* mask                 button   function        argument       release */
+	{ XK_ANY_MOD,           Button4, kscrollup,      {.i = 1},		0, /* !alt */ -1 },
+	{ XK_ANY_MOD,           Button5, kscrolldown,    {.i = 1},		0, /* !alt */ -1 },
 	{ XK_ANY_MOD,           Button2, selpaste,       {.i = 0},      1 },
 	{ ShiftMask,            Button4, ttysend,        {.s = "\033[5;2~"} },
 	{ XK_ANY_MOD,           Button4, ttysend,        {.s = "\031"} },
@@ -205,6 +211,8 @@ static Shortcut shortcuts[] = {
 	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
 	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
 	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ ShiftMask,            XK_Page_Up,     kscrollup,      {.i = -1} },
+    { ShiftMask,            XK_Page_Down,   kscrolldown,    {.i = -1} },
 };
 
 /*
