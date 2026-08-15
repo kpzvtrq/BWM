@@ -128,7 +128,7 @@ static const Key keys[] = {
 
 	{ MODKEY, XK_space,		spawn, {.v = dmenucmd } },
 	{ 0,			XK_F12,			spawn, SHCMD("flameshot gui --path ~/img/screenshots") },
-	{ MODKEY, XK_w, 			spawn, SHCMD("kitty") },
+	{ MODKEY, XK_w, 			spawn, SHCMD("st") },
 	{ MODKEY, XK_l, 			spawn, SHCMD("firefox") },
 
 	{ MODKEY,	XK_1, 	viewprev, {0} },

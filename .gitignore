@@ -2,3 +2,5 @@ bwm
 obj
 *.tar.gz
 *.o
+slstatus/*.o
+st/*.o
