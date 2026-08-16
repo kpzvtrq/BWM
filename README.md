@@ -16,9 +16,13 @@ the /usr/local namespace by default).
 
 Afterwards, run the build script (using sudo if necessary):
 
-    - BSD:       sh build.sh
-    - GNU/Linux: sh build-gnu.sh
+BSD:
 
+    sh build.sh
+
+GNU/Linux:
+
+    sh build-gnu.sh
 
 Running bwm
 -----------
