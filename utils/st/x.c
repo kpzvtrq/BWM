@@ -1630,6 +1630,9 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 	if (IS_SET(MODE_HIDE))
 		return;
 
+	if (win.mode & MODE_BLINK)
+    return;
+
 	/*
 	 * Select the right color for the right mode.
 	 */
@@ -2033,11 +2036,6 @@ run(void)
 	/* Waiting for window mapping */
 	do {
 		XNextEvent(xw.dpy, &ev);
-		/*
-		 * This XFilterEvent call is required because of XOpenIM. It
-		 * does filter out the key event and some client message for
-		 * the input method too.
-		 */
 		if (XFilterEvent(&ev, None))
 			continue;
 		if (ev.type == ConfigureNotify) {
@@ -2055,7 +2053,7 @@ run(void)
 		FD_SET(xfd, &rfd);
 
 		if (XPending(xw.dpy))
-			timeout = 0;  /* existing events might not set xfd */
+			timeout = 0;
 
 		seltv.tv_sec = timeout / 1E3;
 		seltv.tv_nsec = 1E6 * (timeout - 1E3 * seltv.tv_sec);
@@ -2081,31 +2079,25 @@ run(void)
 				(handler[ev.type])(&ev);
 		}
 
-		/*
-		 * To reduce flicker and tearing, when new content or event
-		 * triggers drawing, we first wait a bit to ensure we got
-		 * everything, and if nothing new arrives - we draw.
-		 * We start with trying to wait minlatency ms. If more content
-		 * arrives sooner, we retry with shorter and shorter periods,
-		 * and eventually draw even without idle after maxlatency ms.
-		 * Typically this results in low latency while interacting,
-		 * maximum latency intervals during `cat huge.txt`, and perfect
-		 * sync with periodic updates from animations/key-repeats/etc.
-		 */
 		if (FD_ISSET(ttyfd, &rfd) || xev) {
 			if (!drawing) {
 				trigger = now;
 				drawing = 1;
 			}
 			timeout = (maxlatency - TIMEDIFF(now, trigger)) \
-			          / maxlatency * minlatency;
+			         / maxlatency * minlatency;
+
+			if (blinktimeout) {
+				lastblink = now;
+				win.mode &= ~MODE_BLINK;
+			}
+
 			if (timeout > 0)
-				continue;  /* we have time, try to find idle */
+				continue;
 		}
 
-		/* idle detected or maxlatency exhausted -> draw */
 		timeout = -1;
-		if (blinktimeout && tattrset(ATTR_BLINK)) {
+		if (blinktimeout) {
 			timeout = blinktimeout - TIMEDIFF(now, lastblink);
 			if (timeout <= 0) {
 				if (-timeout > blinktimeout) /* start visible */

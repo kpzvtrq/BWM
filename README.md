@@ -1,7 +1,20 @@
 bwm - bsd window manager
 ========================
-bwm is an extremely fast, small, and dynamic window manager for X. 
-It is a fork of dwm, optimized for BSD systems.
+bwm is more than just a window manager; it is a minimal base environment for X.
+It is a fork of dwm, heavily optimized for BSD systems,
+designed to provide a "ready-to-go" workflow immediately after installation.
+
+
+Features
+--------
+
+* Integrated Environment: Not just a WM, but a cohesive setup including a pre-configured terminal and status bar.
+
+* Batteries Included: Comes with st (simple terminal) and slstatus already integrated and fine-tuned.
+
+* Pre-patched: All essential patches are already applied, tested, and ready for work. No manual patching required.
+
+* Lightweight: Extremely fast, small, and stays out of your way.
 
 
 Requirements
@@ -11,16 +24,18 @@ In order to build bwm you need the Xlib header files.
 
 Installation
 ------------
-Edit config.mk to match your local setup (bwm is installed into
-the /usr/local namespace by default).
+Edit Makefile to match your local setup (bwm is installed into
+the /usr/local/bin namespace by default).
 
-Afterwards, run the build script (using sudo if necessary):
+Note for GNU/Linux users: While a build script for Linux is provided,
+seamless installation and full compatibility on GNU/Linux are not guaranteed.
+This project is primarily focused on and tested for BSD systems.
 
 BSD:
 
     sh build.sh
 
-GNU/Linux:
+GNU/Linux (Use at your own risk):
 
     sh build-gnu.sh
 
@@ -37,13 +52,9 @@ the DISPLAY environment variable is set correctly, e.g.:
 
 Status info
 -----------
-To display status info in the bar, you can add something like this 
-to your .xinitrc:
+Since slstatus is included and pre-configured, you can simply trigger it in your .xinitrc:
 
-    while xsetroot -name "`date` `uptime | sed 's/.*,//'`"
-    do
-    	sleep 1
-    done &
+    slstatus &
     exec bwm
 
 
