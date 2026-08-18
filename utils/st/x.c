@@ -336,7 +336,7 @@ ttysend(const Arg *arg)
 int
 evcol(XEvent *e)
 {
-	int x = e->xbutton.x - borderpx;
+	int x = e->xbutton.x - win.hborderpx;
 	LIMIT(x, 0, win.tw - 1);
 	return x / win.cw;
 }
@@ -344,7 +344,7 @@ evcol(XEvent *e)
 int
 evrow(XEvent *e)
 {
-	int y = e->xbutton.y - borderpx;
+	int y = e->xbutton.y - win.vborderpx;
 	LIMIT(y, 0, win.th - 1);
 	return y / win.ch;
 }
@@ -741,15 +741,17 @@ cresize(int width, int height)
 	if (height != 0)
 		win.h = height;
 
-	col = MAX(1, (win.w - 2 * borderpx) / win.cw);
-	row = MAX(1, (win.h - 2 * borderpx) / win.ch);
+	col = (win.w - 2 * borderpx) / win.cw;
+	row = (win.h - 2 * borderpx) / win.ch;
+	col = MAX(1, col);
+	row = MAX(1, row);
 
 	win.hborderpx = (win.w - col * win.cw) / 2;
 	win.vborderpx = (win.h - row * win.ch) / 2;
 
 	tresize(col, row);
 	xresize(col, row);
-	ttyresize(win.tw, win.th);
+	ttyresize(col, row);
 }
 
 void
@@ -1348,7 +1350,7 @@ xinit(int cols, int rows)
 int
 xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x, int y)
 {
-	float winx = borderpx + x * win.cw, winy = borderpx + y * win.ch, xp, yp;
+	float winx = win.hborderpx + x * win.cw, winy = win.vborderpx + y * win.ch, xp, yp;
 	ushort mode, prevmode = USHRT_MAX;
 	Font *font = &dc.font;
 	int frcflags = FRC_NORMAL;
@@ -1569,20 +1571,20 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 	if (base.mode & ATTR_INVISIBLE)
 		fg = bg;
 
-  if (dmode & DRAW_BG) {
+	if (dmode & DRAW_BG) {
       /* Intelligent cleaning up of the borders. */
       if (x == 0) {
-          xclear(0, (y == 0)? 0 : winy, borderpx,
+          xclear(0, (y == 0)? 0 : winy, win.hborderpx,
                  winy + win.ch +
-                 ((winy + win.ch >= borderpx + win.th)? win.h : 0));
+                 ((winy + win.ch >= win.vborderpx + win.th)? win.h : 0));
       }
-      if (winx + width >= borderpx + win.tw) {
+      if (winx + width >= win.hborderpx + win.tw) {
           xclear(winx + width, (y == 0)? 0 : winy, win.w,
-                 ((winy + win.ch >= borderpx + win.th)? win.h : (winy + win.ch)));
+                 ((winy + win.ch >= win.vborderpx + win.th)? win.h : (winy + win.ch)));
       }
       if (y == 0)
-          xclear(winx, 0, winx + width, borderpx);
-      if (winy + win.ch >= borderpx + win.th)
+          xclear(winx, 0, winx + width, win.vborderpx);
+      if (winy + win.ch >= win.vborderpx + win.th)
           xclear(winx, winy + win.ch, winx + width, win.h);
       /* Fill the background */
       XftDrawRect(xw.draw, bg, winx, winy, width, win.ch);
@@ -1627,6 +1629,9 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 
 	if (IS_SET(MODE_HIDE))
 		return;
+
+	if (win.mode & MODE_BLINK)
+    return;
 
 	/*
 	 * Select the right color for the right mode.
@@ -1683,20 +1688,20 @@ xdrawcursor(int cx, int cy, Glyph g, int ox, int oy, Glyph og)
 		}
 	} else {
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + cy * win.ch,
+				win.hborderpx + cx * win.cw,
+				win.vborderpx + cy * win.ch,
 				win.cw - 1, 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + cy * win.ch,
+				win.hborderpx + cx * win.cw,
+				win.vborderpx + cy * win.ch,
 				1, win.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + (cx + 1) * win.cw - 1,
-				borderpx + cy * win.ch,
+				win.hborderpx + (cx + 1) * win.cw - 1,
+				win.vborderpx + cy * win.ch,
 				1, win.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + cx * win.cw,
-				borderpx + (cy + 1) * win.ch - 1,
+				win.hborderpx + cx * win.cw,
+				win.vborderpx + (cy + 1) * win.ch - 1,
 				win.cw, 1);
 	}
 }
@@ -1799,8 +1804,8 @@ xximspot(int x, int y)
 	if (xw.ime.xic == NULL)
 		return;
 
-	xw.ime.spot.x = borderpx + x * win.cw;
-	xw.ime.spot.y = borderpx + (y + 1) * win.ch;
+	xw.ime.spot.x = win.hborderpx + x * win.cw;
+	xw.ime.spot.y = win.vborderpx + (y + 1) * win.ch;
 
 	XSetICValues(xw.ime.xic, XNPreeditAttributes, xw.ime.spotlist, NULL);
 }
@@ -2031,11 +2036,6 @@ run(void)
 	/* Waiting for window mapping */
 	do {
 		XNextEvent(xw.dpy, &ev);
-		/*
-		 * This XFilterEvent call is required because of XOpenIM. It
-		 * does filter out the key event and some client message for
-		 * the input method too.
-		 */
 		if (XFilterEvent(&ev, None))
 			continue;
 		if (ev.type == ConfigureNotify) {
@@ -2053,7 +2053,7 @@ run(void)
 		FD_SET(xfd, &rfd);
 
 		if (XPending(xw.dpy))
-			timeout = 0;  /* existing events might not set xfd */
+			timeout = 0;
 
 		seltv.tv_sec = timeout / 1E3;
 		seltv.tv_nsec = 1E6 * (timeout - 1E3 * seltv.tv_sec);
@@ -2079,31 +2079,25 @@ run(void)
 				(handler[ev.type])(&ev);
 		}
 
-		/*
-		 * To reduce flicker and tearing, when new content or event
-		 * triggers drawing, we first wait a bit to ensure we got
-		 * everything, and if nothing new arrives - we draw.
-		 * We start with trying to wait minlatency ms. If more content
-		 * arrives sooner, we retry with shorter and shorter periods,
-		 * and eventually draw even without idle after maxlatency ms.
-		 * Typically this results in low latency while interacting,
-		 * maximum latency intervals during `cat huge.txt`, and perfect
-		 * sync with periodic updates from animations/key-repeats/etc.
-		 */
 		if (FD_ISSET(ttyfd, &rfd) || xev) {
 			if (!drawing) {
 				trigger = now;
 				drawing = 1;
 			}
 			timeout = (maxlatency - TIMEDIFF(now, trigger)) \
-			          / maxlatency * minlatency;
+			         / maxlatency * minlatency;
+
+			if (blinktimeout) {
+				lastblink = now;
+				win.mode &= ~MODE_BLINK;
+			}
+
 			if (timeout > 0)
-				continue;  /* we have time, try to find idle */
+				continue;
 		}
 
-		/* idle detected or maxlatency exhausted -> draw */
 		timeout = -1;
-		if (blinktimeout && tattrset(ATTR_BLINK)) {
+		if (blinktimeout) {
 			timeout = blinktimeout - TIMEDIFF(now, lastblink);
 			if (timeout <= 0) {
 				if (-timeout > blinktimeout) /* start visible */
