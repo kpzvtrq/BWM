@@ -1,5 +1,6 @@
 bwm
 utils/st/st
+utils/st/config.bak.h
 utils/slstatus/slstatus
 obj/
 *.tar.gz

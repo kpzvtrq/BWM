@@ -9,7 +9,7 @@ static const unsigned int snap     = 32;       /* snap pixel */
 // static const unsigned int gappoh   = 8;       /* horiz outer gap between windows and screen edge */
 // static const unsigned int gappov   = 8;       /* vert outer gap between windows and screen edge */
 
-enum { GAP = 8 };
+enum { GAP = 6 };
 static const unsigned int gappih = GAP, gappiv = GAP, gappoh = GAP, gappov = GAP;
 
 static       int smartgaps         = 1;        /* 1 means no outer gap when there is only one window */
@@ -41,7 +41,7 @@ static const Rule rules[] = {
 /* layout(s) */
 static const float mfact     		= 0.55; /* factor of master area size [0.05..0.95] */
 static const int nmaster     		= 1;    /* number of clients in master area */
-static const int resizehints 		= 1;    /* 1 means respect size hints in tiled resizals */
+static const int resizehints 		= 0;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 static const int refreshrate 		= 120;  /* refresh rate (per second) for client move/resize */
 

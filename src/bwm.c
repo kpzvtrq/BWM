@@ -2207,6 +2207,13 @@ warp(const Client *c)
 		return;
 	}
 
+	Window dummy;
+	int x, y, winx, winy;
+	unsigned int mask;
+	if (XQueryPointer(dpy, c->win, &dummy, &dummy, &x, &y, &winx, &winy, &mask) &&
+	    winx >= 0 && winx < c->w && winy >= 0 && winy < c->h)
+		return;
+
 	XWarpPointer(dpy, None, root, 0, 0, 0, 0, c->x + c->w / 2, c->y + c->h / 2);
 	XFlush(dpy);
 
