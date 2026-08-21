@@ -1,8 +1,9 @@
 #!/bin/sh
 
-gmake -f Makefile-gnu && doas gmake -f Makefile install
+cd bwm/ && gmake -f Makefile-gnu && doas gmake -f Makefile install
 
-cd utils/slstatus/ && gmake -f Makefile-gnu && doas make -f Makefile-gnu install
-cd ../.. && cd utils/st/ && make -f Makefile-gnu && doas make -f Makefile-gnu install
-cd ../..
+cd slstatus/ && gmake -f Makefile-gnu && doas make -f Makefile-gnu install
+cd .. && cd st/ && make -f Makefile-gnu && doas make -f Makefile-gnu install
+cd ..
 
+# Building the environment for GNU/Linux may fail, since the build is tested exclusively on BSD.

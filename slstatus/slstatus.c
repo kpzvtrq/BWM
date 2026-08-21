@@ -57,7 +57,7 @@ main(int argc, char *argv[])
 	sflag = 0;
 	ARGBEGIN {
 	case 'v':
-		die("slstatus-"VERSION);
+		die("slstatus");
 		break;
 	case '1':
 		done = 1;

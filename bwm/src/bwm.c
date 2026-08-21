@@ -2069,7 +2069,7 @@ void
 updatestatus(void)
 {
 	if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-		strcpy(stext, "bwm-"VERSION);
+		strcpy(stext, "bwm");
 	drawbar(selmon);
 }
 
@@ -2344,7 +2344,7 @@ int
 main(int argc, char *argv[])
 {
 	if (argc == 2 && !strcmp("-v", argv[1]))
-		die("bwm-"VERSION);
+		die("bwm: fatal error");
 	else if (argc != 1)
 		die("usage: bwm [-v]");
 	if (!setlocale(LC_CTYPE, "") || !XSupportsLocale())

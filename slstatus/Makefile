@@ -1,5 +1,3 @@
-VERSION = 1.1
-
 # See LICENSE file for copyright and license details
 # slstatus - suckless status monitor
 .POSIX:
@@ -11,7 +9,7 @@ X11INC = /usr/local/include
 X11LIB = /usr/local/lib
 
 # flags
-CPPFLAGS = -I$(X11INC) -D_DEFAULT_SOURCE -DVERSION=\"${VERSION}\"
+CPPFLAGS = -I$(X11INC) -D_DEFAULT_SOURCE
 CFLAGS   = -std=c99 -pedantic -Wall -Wextra -Wno-unused-parameter -Os
 LDFLAGS  = -L$(X11LIB) -s
 # OpenBSD: add -lsndio
@@ -60,17 +58,17 @@ slstatus: slstatus.o $(COM:=.o) $(REQ:=.o)
 	$(CC) -o $@ $(LDFLAGS) $(COM:=.o) $(REQ:=.o) slstatus.o $(LDLIBS)
 
 clean:
-	rm -f slstatus slstatus.o $(COM:=.o) $(REQ:=.o) slstatus-${VERSION}.tar.gz
+	rm -f slstatus slstatus.o $(COM:=.o) $(REQ:=.o) slstatus.tar.gz
 
 dist:
-	rm -rf "slstatus-$(VERSION)"
-	mkdir -p "slstatus-$(VERSION)/components"
+	rm -rf "slstatus"
+	mkdir -p "slstatus/components"
 	cp -R LICENSE Makefile README config.def.h \
 	      arg.h slstatus.h slstatus.c $(REQ:=.c) $(REQ:=.h) \
-	      slstatus.1 "slstatus-$(VERSION)"
-	cp -R $(COM:=.c) "slstatus-$(VERSION)/components"
-	tar -cf - "slstatus-$(VERSION)" | gzip -c > "slstatus-$(VERSION).tar.gz"
-	rm -rf "slstatus-$(VERSION)"
+	      slstatus.1 "slstatus"
+	cp -R $(COM:=.c) "slstatus/components"
+	tar -cf - "slstatus" | gzip -c > "slstatus.tar.gz"
+	rm -rf "slstatus"
 
 install: all
 	mkdir -p "$(DESTDIR)$(PREFIX)/bin"
